@@ -21,6 +21,7 @@ def onTrack(data):
     x, y, w, h = cv.boundingRect(cont[data])
     cv.rectangle(temp, (x, y), (x + w, y + h), (0, 0, 255), 1)
     cv.imshow("Image", temp)
+    cv.imwrite("one_words.png", temp)
 
 
 cv.namedWindow("Image")
@@ -70,6 +71,7 @@ for i in range(0, len(cont)):
 
 onTrack(0)
 cv.imshow("Words", img2)
+cv.imwrite("all_words.png", img2)
 cv.imshow("Edge", edge)
 cv.waitKey(0)
 cv.destroyAllWindows()
