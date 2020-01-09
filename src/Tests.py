@@ -1,14 +1,12 @@
 import cv2 as cv
 import numpy as np
 from src.Word import Word
-from operator import itemgetter
 
 FILE_NAME = "../images/page.jpg"
 RESIZE_RATIO = 0.65
 
 
 def getWordOrder(words, start, stop):
-    print(start, stop)
     wordsInRange = list(filter(lambda w: start <= w.getCenter()[1] <= stop, words))
     sortedWords = sorted(wordsInRange, key=lambda w: w.getCenter()[0])
     return sortedWords
@@ -41,18 +39,22 @@ gray = cv.bilateralFilter(gray, 11, 75, 75)
 edge = cv.adaptiveThreshold(gray, 255, cv.ADAPTIVE_THRESH_MEAN_C, cv.THRESH_BINARY_INV, 11, 12)
 
 # Show image pre any morphological methods
-# cv.imshow("Pre-Edge", edge)
+cv.imshow("Pre-Edge", edge)
 
 # Dilate to connect letters
 kernel = np.ones((7, 7), np.uint8)
 edge = cv.morphologyEx(edge, cv.MORPH_DILATE, kernel)
 
+cv.imshow("E", edge)
+
 # Get original contours, this will include holes in letters like "O" or "P"
 cont, heir = cv.findContours(edge, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
 
-# Fill in any holes using convex
+# Fill in any holes
 for i in range(0, len(cont)):
     cv.fillConvexPoly(edge, cont[i], 255)
+
+cv.imshow("E2", edge)
 
 # Use erode to disconnect lose connections
 edge = cv.morphologyEx(edge, cv.MORPH_ERODE, kernel)
@@ -67,6 +69,8 @@ cv.createTrackbar("Word", "Image", 0, len(cont)-1, onTrack)
 # Draw the bounding boxes for all the words, and the center points
 words = []
 for i in range(0, len(cont)):
+    if heir[0][i][3] != -1:
+        continue
     words.append(Word(cont[i]))
     x, y, w, h = cv.boundingRect(cont[i])
     cv.rectangle(img2, (x, y), (x + w, y + h), (0, 0, 255), 1)
@@ -106,6 +110,6 @@ for word in words:
 
 onTrack(0)
 cv.imshow("Words", img2)
-# cv.imshow("Edge", edge)
+cv.imshow("Edge", edge)
 cv.waitKey(0)
 cv.destroyAllWindows()

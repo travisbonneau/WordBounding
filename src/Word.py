@@ -17,5 +17,4 @@ class Word:
         return cx, cy
 
     def __str__(self):
-
-        return "(" + self.getCenter()[0] + ", " + self.getCenter()[1] + ")"
+        return "(" + str(self.getCenter()[0]) + ", " + str(self.getCenter()[1]) + ")"
